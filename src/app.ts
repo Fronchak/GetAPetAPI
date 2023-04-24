@@ -1,4 +1,8 @@
 import express from 'express';
+import cors from 'cors';
+
+//Routes
+import authRoutes from './routes/auth-routes';
 
 class App {
     public server: express.Application;
@@ -12,9 +16,15 @@ class App {
 
     private middlewares() {
         this.server.use(express.json());
+        this.server.use(cors({
+            credentials: true,
+            origin: 'http://localhost:3000'
+        }));
+        this.server.use(express.static('src/public'));
     }
 
     private routes() {
+        this.server.use('/auth', authRoutes);
     }
 
     private errorHandler() {
