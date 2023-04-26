@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import errorHandler from './error-handling/error-handler';
 
 //Routes
 import authRoutes from './routes/auth-routes';
@@ -28,6 +29,7 @@ class App {
     }
 
     private errorHandler() {
+        this.server.use(errorHandler);
     }
 }
 
