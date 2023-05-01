@@ -11,6 +11,7 @@ authRoutes.post('/register',
     userInputValidator,
     userInsertValidator,
     checkValidationErrors,
-    resolver(authController.register))
+    resolver(authController.register));
+authRoutes.post('/login', resolver(authController.login));
 
 export default authRoutes;

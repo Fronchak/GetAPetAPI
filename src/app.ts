@@ -4,6 +4,7 @@ import errorHandler from './error-handling/error-handler';
 
 //Routes
 import authRoutes from './routes/auth-routes';
+import userRoutes from './routes/user-routes';
 
 class App {
     public server: express.Application;
@@ -26,6 +27,7 @@ class App {
 
     private routes() {
         this.server.use('/auth', authRoutes);
+        this.server.use('/users', userRoutes);
     }
 
     private errorHandler() {
