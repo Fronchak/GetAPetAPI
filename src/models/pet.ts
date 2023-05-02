@@ -1,6 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 
-interface IPet {
+export interface IPet {
     name: string,
     age: number,
     weight: number,

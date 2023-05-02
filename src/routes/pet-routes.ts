@@ -9,10 +9,12 @@ import imageUpload from "../utils/image-upload";
 const petRoutes = Router();
 
 petRoutes.post('/', 
-    imageUpload.single('image'),
     checkToken,
+    imageUpload.array('images'),
     petInputValidator,
     checkValidationErrors,
     resolver(petController.save));
+
+petRoutes.get('/', resolver(petController.findAll));
 
 export default petRoutes;

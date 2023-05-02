@@ -4,7 +4,8 @@ type PetOutputDTO = {
     age: number;
     weight: number;
     color: string;
-    user: {
+    images: Array<string>;
+    user?: {
         id: string;
         name: string;
         email: string;
