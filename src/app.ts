@@ -1,11 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import errorHandler from './error-handling/error-handler';
-import bodyParser from 'body-parser';
 
 //Routes
 import authRoutes from './routes/auth-routes';
 import userRoutes from './routes/user-routes';
+import petRoutes from './routes/pet-routes';
 
 class App {
     public server: express.Application;
@@ -19,10 +19,6 @@ class App {
 
     private middlewares() {
         this.server.use(express.json());
-        this.server.use(express.urlencoded({ extended: true }));
-        
-        //this.server.use(bodyParser.json());
-        //this.server.use(bodyParser.urlencoded({extended: true}));
         this.server.use(cors({
             credentials: true,
             origin: 'http://localhost:3000'
@@ -33,6 +29,7 @@ class App {
     private routes() {
         this.server.use('/auth', authRoutes);
         this.server.use('/users', userRoutes);
+        this.server.use('/pets', petRoutes);
     }
 
     private errorHandler() {
