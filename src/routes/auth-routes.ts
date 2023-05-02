@@ -4,6 +4,10 @@ import checkValidationErrors from "../middlewares/check-validation-errors";
 import resolver from "./controller-adapter";
 import authController from "../controllers/auth-controller";
 import userInsertValidator from "../validations/user/user-insert-validator";
+import checkToken from "../middlewares/check-token";
+import checkIdParam from "../middlewares/check-id-param";
+import userUpdateValidator from "../validations/user/user-update-validator";
+import imageUpload from "../utils/image-upload";
 
 const authRoutes: Router = Router();
 
@@ -13,5 +17,13 @@ authRoutes.post('/register',
     checkValidationErrors,
     resolver(authController.register));
 authRoutes.post('/login', resolver(authController.login));
+authRoutes.put('/update/:id', 
+    imageUpload.single('image'),
+    checkToken,
+    checkIdParam,
+    userInputValidator,
+    userUpdateValidator,
+    checkValidationErrors,
+    resolver(authController.update));
 
 export default authRoutes;

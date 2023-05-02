@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import errorHandler from './error-handling/error-handler';
+import bodyParser from 'body-parser';
 
 //Routes
 import authRoutes from './routes/auth-routes';
@@ -18,6 +19,10 @@ class App {
 
     private middlewares() {
         this.server.use(express.json());
+        this.server.use(express.urlencoded({ extended: true }));
+        
+        //this.server.use(bodyParser.json());
+        //this.server.use(bodyParser.urlencoded({extended: true}));
         this.server.use(cors({
             credentials: true,
             origin: 'http://localhost:3000'

@@ -5,6 +5,7 @@ import User from '../models/user';
 import CustomRequest from '../interfaces/custom-request';
 
 const checkToken = async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body);
     const authHeaders = req.headers.authorization;
     if(authHeaders && authHeaders.startsWith("Bearer ")) {
         const token = authHeaders.substring(7);

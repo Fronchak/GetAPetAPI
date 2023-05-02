@@ -1,8 +1,8 @@
 import ApiError from "./api-error";
 
 class ForbiddenError extends ApiError {
-    constructor() {
-        super('Forbidden error', `You don't have permission to access this content`, 403);
+    constructor(msg: string = `You don't have permission to access this content`) {
+        super('Forbidden error', msg, 403);
     }
 }
 
