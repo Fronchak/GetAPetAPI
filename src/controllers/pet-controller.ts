@@ -25,6 +25,28 @@ class PetController {
         return res.status(200).json(dtos);
     }
 
+    public async findMyPets(req: Request, res: Response) {
+        const username = (req as CustomRequest).username;
+        const dtos: PetOutputDTO[] = await petService.findByUser(username);
+        return res.status(200).json(dtos);
+    }
+
+    public async findMyAdoptions(req: Request, res: Response) {
+        const username = (req as CustomRequest).username;
+        const dtos: PetOutputDTO[] = await petService.findByAdopter(username);
+        return res.status(200).json(dtos);
+    }
+
+    public async findById(req: Request, res: Response) {
+        const dto = await petService.findById(req.params.id);
+        return res.status(200).json(dto);
+    }
+
+    public async removeById(req: Request, res: Response) {
+        const username = (req as CustomRequest).username;
+        await petService.removePetById(req.params.id, username);
+        return res.sendStatus(204);
+    }
 }
 
 export default new PetController();
