@@ -37,9 +37,22 @@ petRoutes.get('/:id',
     checkIdParam,
     resolver(petController.findById));
 petRoutes.get('/', resolver(petController.findAll));
+
+petRoutes.patch('/schedule/:id',
+    checkToken,
+    checkIdParam,
+    resolver(petController.schedule));
+
+petRoutes.patch('/concluded-adoption/:id',
+    checkToken,
+    checkIdParam,
+    resolver(petController.concludedAdoption));
+
 petRoutes.delete('/:id',
     checkToken,
     checkIdParam,
     resolver(petController.removeById));
+
+
 
 export default petRoutes;

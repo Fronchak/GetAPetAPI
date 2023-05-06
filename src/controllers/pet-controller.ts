@@ -58,6 +58,18 @@ class PetController {
         await petService.removePetById(req.params.id, username);
         return res.sendStatus(204);
     }
+
+    public async schedule(req: Request, res: Response) {
+        const username = (req as CustomRequest).username;
+        await petService.schedule(req.params.id, username);
+        return res.sendStatus(204);
+    }
+
+    public async concludedAdoption(req: Request, res: Response) {
+        const username = (req as CustomRequest).username;
+        await petService.concludedAdoption(req.params.id, username);
+        return res.sendStatus(204);
+    }
 }
 
 export default new PetController();

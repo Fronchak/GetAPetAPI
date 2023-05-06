@@ -2,6 +2,7 @@ import PetCompleteOutputDTO from "../dtos/pet/pet-complete-output-dto";
 import PetInputDTO from "../dtos/pet/pet-input-dto";
 import PetOutputDTO from "../dtos/pet/pet-output-dto";
 import PetUpdateDTO from "../dtos/pet/pet-update-dto";
+import BadRequestError from "../errors/bas-request-error";
 import EntityNotFoundError from "../errors/entity-not-found-error";
 import ForbiddenError from "../errors/forbidden-error";
 import UnauthorizedError from "../errors/unauthorized-error";
@@ -66,13 +67,20 @@ class PetService {
     }
 
     public async findById(id: string): Promise<PetCompleteOutputDTO> {
-        const pet = await Pet.findById(id).populate('user').populate('adopter');
+        const pet = await Pet.findById(id).populate(['user', 'adopter']);
         if(!pet) {
             throw new EntityNotFoundError('Pet not found');
         }
         const user = pet.user as any;
-        console.log('user', user);
-        const adopter = pet.adopter;
+        const adopter = pet.adopter as any;
+        let adopterDTO: any;
+        if(adopter) {
+            adopterDTO = {
+                email: adopter.email,
+                name: adopter.name,
+                phone: adopter.phone
+            };
+        }
         return {
             id: pet._id.toString(),
             name: pet.name,
@@ -85,23 +93,13 @@ class PetService {
                 name: user.name,
                 phone: user.phone
             },
-            adopter: {
-                email: '',
-                name: '',
-                phone: ''
-            }
+            adopter: adopterDTO
         }
     }
 
     public async removePetById(id: string, username: string) {
-        const pet = await Pet.findById(id);
-        if(!pet) {
-            throw new EntityNotFoundError('Pet not found');
-        }
-        const user = await User.findOne({ 'email': username });
-        if(!user) {
-            throw new EntityNotFoundError('User not found');
-        }
+        const pet = await PetService.getPet(id);
+        const user = await PetService.getUser(username);
         if(pet.user.toString() !== user._id.toString()) {
             throw new ForbiddenError(`You cannot delete a pet that is not yours`);
         }
@@ -109,18 +107,11 @@ class PetService {
     }
 
     public async update(inputDTO: PetUpdateDTO, username: string, images: Array<string>, id: string): Promise<PetOutputDTO> {
-        const user = await User.findOne({ 'email': username });
-        if(!user) {
-            throw new UnauthorizedError();
-        }
-        const pet = await Pet.findById(id);
-        if(!pet) {
-            throw new EntityNotFoundError('Pet not found');
-        }
+        const user = await PetService.getUser(username);
+        const pet = await PetService.getPet(id);
         if(pet.user.toString() != user._id.toString()) {
             throw new ForbiddenError('You cannot update a pet that it is not yours');
         }
-        console.log('IS NEW: ' + pet.isNew);
         pet.name = inputDTO.name;
         pet.age = inputDTO.age;
         pet.weight = inputDTO.weight;
@@ -141,6 +132,51 @@ class PetService {
                 email: user.email
             }
         }
+    }
+
+    private static async getUser(username: string) {
+        const user = await User.findOne({ 'email': username });
+        if(!user) {
+            throw new UnauthorizedError();
+        }
+        return user; 
+    }
+
+    private static async getPet(id: string) {
+        const pet = await Pet.findById(id);
+        if(!pet) {
+            throw new EntityNotFoundError('Pet not found');
+        }
+        return pet;
+    }
+
+    public async schedule(id: string, username: string) {
+        const user = await PetService.getUser(username);
+        const pet = await PetService.getPet(id);
+        if(pet.user.toString() == user._id.toString()) {
+            throw new BadRequestError('You cannot adopt your own pet');
+        }
+        if(pet.adopter && pet.adopter.equals(user._id)) {
+            throw new BadRequestError('You already scredule a visit to the same pet');
+        }
+        if(!pet.available) {
+            throw new BadRequestError('This pet is not available for adoption');
+        }
+        pet.adopter = user._id;
+        await pet.save();
+    }
+
+    public async concludedAdoption(id: string, username: string) {
+        const user = await PetService.getUser(username);
+        const pet = await PetService.getPet(id);
+        if(user._id.toString() != pet.user._id.toString()) {
+            throw new ForbiddenError('You cannot concluded a adoption to a pet that it is not yours');
+        }
+        if(!pet.adopter) {
+            throw new BadRequestError('This pet has no adoptions schedule yet');
+        }
+        pet.available = false;
+        await pet.save();
     }
 }
 
