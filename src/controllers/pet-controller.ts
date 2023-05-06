@@ -10,7 +10,6 @@ class PetController {
 
     public async save(req: Request, res: Response) {
         const images: Express.Multer.File[] | undefined = req.files as Express.Multer.File[] | undefined;
-        console.log('images', images);
         if(!images || images.length === 0) {
             throw new ValidationError([new FieldError('images', 'Images is required')]);
         }
@@ -18,6 +17,18 @@ class PetController {
         const username = (req as CustomRequest).username;
         const outputDTO: PetOutputDTO = await petService.save(req.body, username, photos);
         return res.status(201).json(outputDTO);
+    }
+
+    public async update(req: Request, res: Response) {
+        const images: Express.Multer.File[] | undefined = req.files as Express.Multer.File[] | undefined;
+        if(!images || images.length === 0) {
+            throw new ValidationError([new FieldError('images', 'Images is required')]);
+        }
+        const photos = images.map((image) => image.filename);
+        const username = (req as CustomRequest).username;
+        const id = req.params.id;
+        const outputDTO: PetOutputDTO = await petService.update(req.body, username, photos, id);
+        return res.status(200).json(outputDTO);
     }
 
     public async findAll(req: Request, res: Response) {

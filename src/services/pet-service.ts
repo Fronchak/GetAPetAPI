@@ -1,6 +1,7 @@
 import PetCompleteOutputDTO from "../dtos/pet/pet-complete-output-dto";
 import PetInputDTO from "../dtos/pet/pet-input-dto";
 import PetOutputDTO from "../dtos/pet/pet-output-dto";
+import PetUpdateDTO from "../dtos/pet/pet-update-dto";
 import EntityNotFoundError from "../errors/entity-not-found-error";
 import ForbiddenError from "../errors/forbidden-error";
 import UnauthorizedError from "../errors/unauthorized-error";
@@ -105,6 +106,41 @@ class PetService {
             throw new ForbiddenError(`You cannot delete a pet that is not yours`);
         }
         await Pet.findByIdAndDelete(id);
+    }
+
+    public async update(inputDTO: PetUpdateDTO, username: string, images: Array<string>, id: string): Promise<PetOutputDTO> {
+        const user = await User.findOne({ 'email': username });
+        if(!user) {
+            throw new UnauthorizedError();
+        }
+        const pet = await Pet.findById(id);
+        if(!pet) {
+            throw new EntityNotFoundError('Pet not found');
+        }
+        if(pet.user.toString() != user._id.toString()) {
+            throw new ForbiddenError('You cannot update a pet that it is not yours');
+        }
+        console.log('IS NEW: ' + pet.isNew);
+        pet.name = inputDTO.name;
+        pet.age = inputDTO.age;
+        pet.weight = inputDTO.weight;
+        pet.color = inputDTO.color;
+        pet.available = inputDTO.available;
+        pet.images = images;
+        await pet.save()
+        return {
+            id: pet._id.toString(),
+            name: pet.name,
+            weight: pet.weight,
+            color: pet.color,
+            age: pet.age,
+            images,
+            user: {
+                id: user._id.toString(),
+                name: user.name,
+                email: user.email
+            }
+        }
     }
 }
 
