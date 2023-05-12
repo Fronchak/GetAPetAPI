@@ -17,6 +17,19 @@ class UserService {
         };
     }
 
+    public async profile(username: string): Promise<UserOutputDTO> {
+        const user = await User.findOne({ 'email': username });
+        if(!user) {
+            throw new EntityNotFoundError('User not found');
+        }
+        return {
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            phone: user.phone
+        }
+    }
+
 }
 
 export default new UserService();

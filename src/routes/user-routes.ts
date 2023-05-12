@@ -6,9 +6,13 @@ import userController from "../controllers/user-controller";
 
 const userRoutes = Router();
 
+userRoutes.get('/profile',
+    checkToken,
+    resolver(userController.profile));
 userRoutes.get('/:id', 
     checkToken,
     checkIdParam,
     resolver(userController.findById));
+
 
 export default userRoutes;

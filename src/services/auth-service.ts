@@ -45,8 +45,8 @@ class AuthService {
         return tokenService.makeToken(user.email);
     }
 
-    public async update(inputDTO: UserInputDTO, id: string, tokenUsername: string, image: string | undefined) {
-        const userById = await User.findById(id);
+    public async update(inputDTO: UserInputDTO, tokenUsername: string, image: string | undefined) {
+        const userById = await User.findOne({ 'email': tokenUsername });
         if(!userById) {
             throw new EntityNotFoundError('User not found');
         }
@@ -63,19 +63,17 @@ class AuthService {
         }
         const salt = await bcrypt.genSalt(12);
         const password = await bcrypt.hash(inputDTO.password, salt);
-        console.log('id', id);
-        await User.findByIdAndUpdate(id, {
+        await User.findByIdAndUpdate(userById._id, {
             email: inputDTO.email,
             name: inputDTO.name,
             phone: inputDTO.phone,
             password
         });
         if(image) {
-            await User.findByIdAndUpdate(id, { image });
+            await User.findByIdAndUpdate(userById._id, { image });
         }
         else {
-            console.log('Entrou no else');
-            await User.findByIdAndUpdate(id, { '$unset': { 'image': '' } });
+            await User.findByIdAndUpdate(userById._id, { '$unset': { 'image': '' } });
         }
     }
 

@@ -17,10 +17,9 @@ authRoutes.post('/register',
     checkValidationErrors,
     resolver(authController.register));
 authRoutes.post('/login', resolver(authController.login));
-authRoutes.put('/update/:id', 
-    imageUpload.single('image'),
+authRoutes.put('/update', 
     checkToken,
-    checkIdParam,
+    imageUpload.single('image'),
     userInputValidator,
     userUpdateValidator,
     checkValidationErrors,

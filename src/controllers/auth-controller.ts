@@ -21,9 +21,7 @@ class AuthController {
         if(req.file) {
             image = req.file.filename;
         }
-        console.log('req.file', req.file);
-        console.log('image', image);
-        await authService.update(req.body, req.params.id, username, image);
+        await authService.update(req.body, username, image);
         return res.sendStatus(204);
     }
 }

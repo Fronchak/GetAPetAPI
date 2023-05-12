@@ -1,5 +1,6 @@
 import { body, validationResult } from 'express-validator';
 import User from '../../models/user';
+import CustomRequest from '../../interfaces/custom-request';
 
 const userUpdateValidator = [
     body('email').custom((value, { req }) => {
@@ -10,8 +11,8 @@ const userUpdateValidator = [
         }
         return User.findOne({ 'email': value })
             .then((user) => {
-                const id = req.params?.id;
-                if(user && user._id.toString() !== id) {
+                const username = (req as CustomRequest).username;
+                if(user && user.email !== username) {
                     return Promise.reject('Email already register');
                 }
                 else {
